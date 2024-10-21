@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Location {
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  latitude   Float
+  longitude  Float
+  Restaurant Restaurant[]
+}
+
+model Restaurant {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  cuisine    String
+  location   Location @relation(fields: [locationId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  locationId String   @db.ObjectId
+}
