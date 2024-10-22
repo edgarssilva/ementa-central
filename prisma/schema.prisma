@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Zones {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  image String
+}
+
 model Location {
   id         String       @id @default(auto()) @map("_id") @db.ObjectId
   latitude   Float
@@ -15,11 +21,47 @@ model Location {
 }
 
 model Restaurant {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  name       String
-  cuisine    String
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  slug    String
+  images  String[]
+  cuisine String
+
+  menus Menu[]
+
   location   Location @relation(fields: [locationId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
   locationId String   @db.ObjectId
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Reservation Reservation[]
+}
+
+model Menu {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  items        MenuItem[]
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String     @db.ObjectId
+}
+
+model MenuItem {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  name   String
+  price  Float
+  menu   Menu   @relation(fields: [menuId], references: [id])
+  menuId String @db.ObjectId
+}
+
+model Reservation {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  phone     String
+  date      DateTime
+  partySize Int
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String     @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
