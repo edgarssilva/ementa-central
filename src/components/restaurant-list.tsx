@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
 import Link from "next/link";
+import { Restaurant } from "@prisma/client";
 
 
-export default function RestaurantList({ restaurants }: { restaurants: any[] }) {
+export default function RestaurantList({ restaurants }: { restaurants: Restaurant[] }) {
     const [searchTerm, setSearchTerm] = useState("")
 
     const filteredRestaurants = restaurants.filter((restaurant) =>
@@ -40,7 +41,7 @@ export default function RestaurantList({ restaurants }: { restaurants: any[] }) 
                         {filteredRestaurants.map((restaurant) => (
                             <Card key={restaurant.id} className="overflow-hidden">
                                 <Image
-                                    src={restaurant.image}
+                                    src={restaurant.images[0]}
                                     alt={restaurant.name}
                                     width={300}
                                     height={200}
@@ -50,11 +51,13 @@ export default function RestaurantList({ restaurants }: { restaurants: any[] }) 
                                     <CardTitle>{restaurant.name}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-muted-foreground">{restaurant.cuisine} Cuisine</p>
+                                    <p className="text-muted-foreground">{restaurant.description}</p>
+                                    <p className="text-muted-foreground">{restaurant.phoneNumber}</p>
+                                    <p className="text-muted-foreground">{restaurant.hours}</p>
                                 </CardContent>
                                 <CardFooter>
-                                    <Link href={"/restaurantes/" + restaurant.name}>
-                                        <Button variant="outline" className="w-full">Ver Detalhes</Button>
+                                    <Link href={"/restaurantes/" + restaurant.slug}>
+                                        <Button variant="default" className="w-full">Ver Detalhes</Button>
                                     </Link>
                                 </CardFooter>
                             </Card>

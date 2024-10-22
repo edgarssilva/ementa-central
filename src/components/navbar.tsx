@@ -13,6 +13,7 @@ export default function Navbar() {
                             Central</Link>
                     </div>
                     <div className='flex gap-4'>
+                        <Link href="/" className='text-white hover:underline'>Localidades</Link>
                         <Link href="/restaurantes" className='text-white hover:underline'>Restaurantes</Link>
                         <Link href="/sobre" className='text-white hover:underline'>Sobre</Link>
                     </div>
