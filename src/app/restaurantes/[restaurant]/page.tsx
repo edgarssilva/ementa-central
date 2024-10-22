@@ -53,7 +53,8 @@ const IconMap = {
     Accessibility: Accessibility,
 }
 
-export default function RestaurantPage({ params }: { params: { restaurant: string } }) {
+export default async function RestaurantPage(props: { params: Promise<{ restaurant: string }> }) {
+    const params = await props.params;
     return (
         <div className="container mx-auto px-4 py-8">
             <Card className="overflow-hidden">
