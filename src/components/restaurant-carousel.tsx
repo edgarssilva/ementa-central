@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from 'react'
 import Image from 'next/image';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from './ui/carousel';
+import { Restaurant } from '@prisma/client';
 
-export default function RestaurantCarousel({ restaurant }: { restaurant: any }) {
+export default function RestaurantCarousel({ restaurant }: { restaurant: Restaurant }) {
     const [api, setApi] = useState<CarouselApi>();
 
     useEffect(() => {
@@ -36,8 +37,8 @@ export default function RestaurantCarousel({ restaurant }: { restaurant: any }) 
                     </CarouselItem>
                 ))}
             </CarouselContent>
-            <CarouselPrevious className='m-8' />
-            <CarouselNext className='mr-8' />
+            <CarouselPrevious className='ml-14 transition-opacity opacity-15 hover:opacity-100' />
+            <CarouselNext className='mr-14 transition-opacity opacity-15 hover:opacity-100' />
         </Carousel>
     )
 }

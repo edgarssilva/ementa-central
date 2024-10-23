@@ -12,11 +12,14 @@ import {
     Accessibility,
     Car,
     CreditCard,
+    Home,
     Music,
+    Phone,
     Utensils,
     Wifi,
 } from "lucide-react";
 import { PrismaClient } from "@prisma/client";
+import ReservationForm from "@/components/restaurant-reservation";
 
 const IconMap = new Map<string, any>();
 IconMap.set("Wifi", Wifi);
@@ -57,23 +60,30 @@ export default async function RestaurantPage({ params }: Props) {
                 <Card className="overflow-hidden">
                     <CardHeader>
                         <RestaurantCarousel restaurant={restaurant} />
-                        <CardTitle className="text-3xl">{restaurant.name}</CardTitle>
+                        <CardTitle className="text-4xl">{restaurant.name}</CardTitle>
                         <CardDescription>{restaurant.description}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="grid gap-4">
                             <p>{restaurant.description}</p>
                             <div>
-                                <h3 className="font-semibold mb-2">Contact Information:</h3>
-                                <p>ADD ADRESS</p>
-                                <p>{restaurant.phoneNumber}</p>
+                                <div className="flex items-center gap-2">
+                                    <Home className="h-4 w-4" />
+                                    <p>{restaurant.address}</p>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <Phone className="w-4 h-4" /> <p>{restaurant.phoneNumber}</p>
+                                </div>
+
+                                {restaurant.socials.map(s => <p>{s}</p>)}
                             </div>
                             <div>
-                                <h3 className="font-semibold mb-2">Hours:</h3>
+                                <h3 className="font-semibold mb-2">Horário:</h3>
                                 <p>{restaurant.hours}</p>
                             </div>
                             <div>
-                                <h3 className="font-semibold mb-2">Amenities:</h3>
+                                <h3 className="font-semibold mb-2">Comodidades:</h3>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                     {restaurant.amenities.map((a: string) => {
                                         const Icon = IconMap.get(a) || CreditCard;
@@ -89,17 +99,17 @@ export default async function RestaurantPage({ params }: Props) {
                         </div>
                     </CardContent>
                 </Card>
-                <div className="min-w-96">
-                    <div className="flex flex-col">
+                <div className="lg:w-2/5">
+                    {/*<div className="flex flex-col">
                         <h2 className="text-2xl font-bold mb-4">Menu Diário</h2>
                         <div className="bg-muted rounded-lg p-4 h-96 flex items-center justify-center">
                             <p className="text-muted-foreground">Daily menu will be displayed here</p>
                         </div>
-                    </div>
-                    <div className="mt-8">
-                        <h2 className="text-2xl font-bold mb-4">Reservas</h2>
-                        <div className="bg-muted rounded-lg p-4 h-64 flex items-center justify-center">
-                            <p className="text-muted-foreground">Reservas will be displayed here</p>
+                    </div>*/}
+                    <div className="mt-0 bg-muted rounded-lg p-4">
+                        <h2 className="text-2xl font-bold mb-4">Reserva</h2>
+                        <div className="flex items-center justify-center">
+                            <ReservationForm />
                         </div>
                     </div>
 
