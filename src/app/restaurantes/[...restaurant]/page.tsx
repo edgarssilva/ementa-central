@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { PrismaClient } from "@prisma/client";
 import ReservationForm from "@/components/restaurant-reservation";
+import DailyMenu from "@/components/daily-menu";
 
 const IconMap = new Map<string, any>();
 IconMap.set("Wifi", Wifi);
@@ -99,20 +100,11 @@ export default async function RestaurantPage({ params }: Props) {
                         </div>
                     </CardContent>
                 </Card>
-                <div className="lg:w-2/5">
-                    {/*<div className="flex flex-col">
-                        <h2 className="text-2xl font-bold mb-4">Menu Diário</h2>
-                        <div className="bg-muted rounded-lg p-4 h-96 flex items-center justify-center">
-                            <p className="text-muted-foreground">Daily menu will be displayed here</p>
-                        </div>
-                    </div>*/}
-                    <div className="mt-0 bg-muted rounded-lg p-4">
-                        <h2 className="text-2xl font-bold mb-4">Reserva</h2>
-                        <div className="flex items-center justify-center">
-                            <ReservationForm />
-                        </div>
-                    </div>
-
+                <div className="w-full lg:w-2/5">
+                    <h2 className="text-2xl font-bold mb-2">Menu Diário</h2>
+                    <DailyMenu menu={"https://content.wepik.com/statics/25815429/preview-page0.jpg"} />
+                    <h2 className="text-2xl font-bold mt-8 mb-2">Reservar</h2>
+                    <ReservationForm restaurantId={restaurant.id} />
                 </div>
             </div>
 

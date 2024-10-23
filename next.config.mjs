@@ -19,6 +19,11 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'www.cm-oliveiradohospital.pt',
             },
+            {
+                protocol: 'https',
+                hostname: 'content.wepik.com',
+            },
+
         ],
     }
 };

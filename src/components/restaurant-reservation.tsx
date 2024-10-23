@@ -32,8 +32,10 @@ import {
 } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils"
+import { makeReservationAction } from "@/actions/reservations"
 
 const formSchema = z.object({
+    restaurantId: z.string(),
     phoneNumber: z.string().regex(/^\d{9}$/, {
         message: "O número de telefone deve ter 9 dígitos",
     }),
@@ -48,7 +50,9 @@ const formSchema = z.object({
     }),
 })
 
-export default function ReservationForm() {
+export type ReservationFormValues = z.infer<typeof formSchema>;
+
+export default function ReservationForm({ restaurantId }: { restaurantId: string }) {
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const { toast } = useToast();
@@ -63,140 +67,143 @@ export default function ReservationForm() {
         },
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    async function onSubmit(values: ReservationFormValues) {
         setIsSubmitting(true)
-        // Simulate API call
-        setTimeout(() => {
-            setIsSubmitting(false)
+        try {
+            console.log(values)
+            const reservation = await makeReservationAction(values);
+            console.log(reservation)
             toast({
                 title: "Reserva Submetida!",
-                description: `Tlm: ${values.phoneNumber}, Data: ${values.date.toDateString()}, Hora: ${values.time}, Nº: ${values.people}\nAguarde pela confirmação.`,
-            })
-            form.reset()
-        }, 2000)
+                description: `Tlm: ${reservation.phone}, Data: ${reservation.date.toISOString()}, NºPessoas: ${reservation.partySize}`,
+            });
+
+            form.reset();
+        } catch (error: any) {
+            toast({
+                title: "Erro ao submeter a reserva",
+                description: "Por favor, tente novamente.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Número de Telemóvel</FormLabel>
-                            <FormControl>
-                                <Input placeholder="911222333" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                Introduza o seu número de telemóvel.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="date"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                            <FormLabel>Data</FormLabel>
-                            <Popover>
-                                <PopoverTrigger asChild>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <input type="hidden" {...form.register("restaurantId")} value={restaurantId} />
+
+                <div className="flex space-x-4">
+                    <FormField
+                        control={form.control}
+                        name="date"
+                        render={({ field }) => (
+                            <FormItem className="flex-1">
+                                <FormLabel>Data</FormLabel>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <FormControl>
+                                            <Button
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-full justify-start text-left font-normal",
+                                                    !field.value && "text-muted-foreground"
+                                                )}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {field.value ? field.value.toLocaleDateString('pt-PT') : <span>Escolha uma data</span>}
+                                            </Button>
+                                        </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            selected={field.value}
+                                            onSelect={field.onChange}
+                                            disabled={(date) =>
+                                                date < new Date() || date > new Date(new Date().setMonth(new Date().getMonth() + 2))
+                                            }
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="time"
+                        render={({ field }) => (
+                            <FormItem className="flex-1">
+                                <FormLabel>Hora</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
-                                        <Button
-                                            variant={"outline"}
-                                            className={cn(
-                                                "w-[240px] pl-3 text-left font-normal",
-                                                !field.value && "text-muted-foreground"
-                                            )}
-                                        >
-                                            {field.value ? (
-                                                field.value.toDateString()
-                                            ) : (
-                                                <span>Escolha uma data</span>
-                                            )}
-                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                        </Button>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Selecione a hora" />
+                                        </SelectTrigger>
                                     </FormControl>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        selected={field.value}
-                                        onSelect={field.onChange}
-                                        disabled={(date) =>
-                                            date < new Date() || date > new Date(new Date().setMonth(new Date().getMonth() + 2))
-                                        }
-                                        initialFocus
-                                    />
-                                </PopoverContent>
-                            </Popover>
-                            <FormDescription>
-                                Escolha uma data para a sua reserva.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="time"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Time</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <SelectContent>
+                                        {[...Array(9)].map((_, i) => {
+                                            const hour = i + 12
+                                            return (
+                                                <SelectItem key={hour} value={`${hour}:00`}>
+                                                    {`${hour}:00`}
+                                                </SelectItem>
+                                            )
+                                        })}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+
+                <div className="flex space-x-4">
+                    <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                            <FormItem className="flex-grow">
+                                <FormLabel>Número de Telefone</FormLabel>
                                 <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Selecionar a hora" />
-                                        <Clock className="ml-auto h-4 w-4 opacity-50" />
-                                    </SelectTrigger>
+                                    <Input placeholder="912345678" {...field} />
                                 </FormControl>
-                                <SelectContent>
-                                    {[...Array(9)].map((_, i) => {
-                                        const hour = i + 12
-                                        return (
-                                            <SelectItem key={hour} value={`${hour}:00`}>
-                                                {`${hour}:00`}
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="people"
+                        render={({ field }) => (
+                            <FormItem className="flex-grow">
+                                <FormLabel>Número de Pessoas</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Selecione o número de pessoas" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {[...Array(10)].map((_, i) => (
+                                            <SelectItem key={i + 1} value={(i + 1).toString()}>
+                                                {i + 1}
                                             </SelectItem>
-                                        )
-                                    })}
-                                </SelectContent>
-                            </Select>
-                            <FormDescription>Escolha uma hora para a sua reserva.</FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="people"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Número de Pessoas</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Número de pessoas" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {[...Array(10)].map((_, i) => (
-                                        <SelectItem key={i + 1} value={(i + 1).toString()}>
-                                            {i + 1}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <FormDescription>
-                                Selecione o número de pessoas para a sua reserva.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "A Submeter..." : "Marcar Reserva"}
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? "A submeter..." : "Fazer Reserva"}
                 </Button>
             </form>
         </Form>
