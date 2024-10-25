@@ -56,9 +56,9 @@ export default async function RestaurantPage({ params }: Props) {
     if (!restaurant) return notFound();
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-12 py-8">
             <div className="flex flex-wrap lg:flex-nowrap gap-6">
-                <Card className="overflow-hidden">
+                <Card className="overflow-hidden basis-2/3">
                     <CardHeader>
                         <RestaurantCarousel restaurant={restaurant} />
                         <CardTitle className="text-4xl">{restaurant.name}</CardTitle>

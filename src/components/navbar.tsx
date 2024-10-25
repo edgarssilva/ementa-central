@@ -1,25 +1,25 @@
 import Link from 'next/link'
 import React from 'react'
-import { MapPin } from 'lucide-react'
+import Image from 'next/image'
 
 export default function Navbar() {
     return (
-        <nav className="bg-gray-800">
-            <div className="container mx-auto px-4">
+        <header className="bg-gray-800">
+            <div className="px-16">
                 <div className="flex justify-between items-center py-4">
                     <div>
-                        <Link href="/" className="text-white text-2xl font-bold">Ementa
-                            <MapPin size={24} className="inline-block" />
-                            Central</Link>
+                        <Link href="/" className="text-white text-2xl font-bold">
+                            <Image src="/ementacentral.png" alt="Ementa Central" width={200} height={50} />
+                        </Link>
                     </div>
-                    <div className='flex gap-4'>
+                    <nav className='flex gap-4'>
                         <Link href="/" className='text-white hover:underline'>Localidades</Link>
                         <Link href="/restaurantes" className='text-white hover:underline'>Restaurantes</Link>
                         <Link href="/sobre" className='text-white hover:underline'>Sobre</Link>
-                    </div>
+                    </nav>
                 </div>
             </div>
-        </nav>
+        </header>
     )
 }
 

@@ -2,7 +2,9 @@ import React from 'react'
 
 export default function About() {
     return (
-        <div className='container mx-auto'>Sobre</div>
+        <div className="max-w-[64rem] py-4 mx-auto px-[1rem]">
+            Sobre
+        </div>
     )
 }
 
