@@ -9,17 +9,39 @@ export default async function Home() {
     const prisma = new PrismaClient();
     const zones = await prisma.zone.findMany();
 
+    const selection = await prisma.restaurant.findMany({ take: 3 });
+
     return (
         <div>
             <div className="h-80 w-full bg-green-800" />
             <div className="max-w-[64rem] py-4 mx-auto px-[1rem] pb-40">
-                <h1 className="text-3xl font-bold mb-2 mt-4">Municípios</h1>
+                <h1 className="text-2xl font-semibold mt-4 mb-2">Seleções Ementa Central</h1>
+                <div className="flex gap-8">
+                    {selection.map((restaurant) => (
+                        <Card key={restaurant.id} className="basis-1/3">
+                            <Link href={`/restaurantes/${restaurant.slug}`}>
+                                <Image
+                                    src={restaurant.images[0]}
+                                    alt={restaurant.name}
+                                    width={300}
+                                    height={200}
+                                />
+                                <CardContent>
+                                    <CardTitle className="mb-2">{restaurant.name}</CardTitle>
+                                    {restaurant.description.length > 100 ? restaurant.description.slice(0, 100) + "..." : restaurant.description}
+                                </CardContent>
+                            </Link>
+                        </Card>
+                    ))}
+                </div>
+
+                <h1 className="text-2xl font-semibold mt-8 mb-2">Municípios</h1>
                 <Carousel className="w-full">
-                    <CarouselContent className="items-center">
+                    <CarouselContent className="items-stretch">
                         {zones.map((zone) => (
-                            <CarouselItem key={zone.id} className="md:basis-1/4 lg:basis-1/5 ">
+                            <CarouselItem key={zone.id} className="md:basis-1/4 lg:basis-1/5">
                                 <Link href={`/localidades/${zone.id}`}>
-                                    <div className="border p-2 text-center ">
+                                    <div className="border p-2 text-center flex flex-col justify-center h-full">
                                         <Image
                                             src={zone.image}
                                             alt={zone.name}

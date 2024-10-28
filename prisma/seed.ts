@@ -41,7 +41,7 @@ async function main() {
             data: {
                 name,
 
-                slug: name.toLowerCase().replace(/ /g, "-"),
+                slug: name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
                 locationId: locationIds[index].id,
                 zoneId: zoneIds[index].id,
                 images: ["/restaurante1.jpg", "/restaurante2.jpg", "/restaurante3.jpg"],

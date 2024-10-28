@@ -1,25 +1,49 @@
 'use client';
 
-import { useState } from "react"
-import { Search } from "lucide-react"
+import { ChangeEventHandler, useState } from "react"
+import { Clock, HomeIcon, Phone, Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
 import Link from "next/link";
-import { Restaurant } from "@prisma/client";
+import { Restaurant, Zone } from "@prisma/client";
+import LocationComboBox from "./location-combobox";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import slugify from "slugify";
 
 
-export default function RestaurantList({ restaurants }: { restaurants: Restaurant[] }) {
-    const [searchTerm, setSearchTerm] = useState("")
+export default function RestaurantList({ restaurants, zones }: { restaurants: Restaurant[], zones: Zone[] }) {
+    const { replace } = useRouter()
+    const pathName = usePathname()
+    const searchParams = useSearchParams()
+
+    const searchTerm = searchParams.get("pesquisa") || ""
+    const zoneSlug = searchParams.get("municipio")
+
+    const currentZone = zones.find((zone) => slugify(zone.name) === zoneSlug)
 
     const filteredRestaurants = restaurants.filter((restaurant) =>
-        restaurant.name.toLowerCase().includes(searchTerm.toLowerCase())
+        (searchTerm === "" || restaurant.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (currentZone ? restaurant.zoneId === currentZone.id : true)
     )
+
+    const handleSearch: ChangeEventHandler<HTMLInputElement> = (e) => {
+        const params = new URLSearchParams(searchParams)
+
+        if (e.target.value === "") {
+            params.delete("pesquisa")
+        } else {
+            params.set("pesquisa", e.target.value)
+        }
+
+        replace(`${pathName}?${params.toString()}`)
+    }
 
     return (
         <>
             <div className="flex flex-col md:flex-row gap-4 mb-8">
+                <LocationComboBox zones={zones} />
                 <div className="flex-grow">
                     <div className="relative">
                         <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
@@ -27,8 +51,8 @@ export default function RestaurantList({ restaurants }: { restaurants: Restauran
                             type="text"
                             placeholder="Pesquisar restaurantes..."
                             className="pl-8"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            defaultValue={searchTerm}
+                            onChange={handleSearch}
                         />
                     </div>
                 </div>
@@ -50,9 +74,10 @@ export default function RestaurantList({ restaurants }: { restaurants: Restauran
                                 <CardTitle>{restaurant.name}</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-muted-foreground">{restaurant.description}</p>
-                                <p className="text-muted-foreground">{restaurant.phoneNumber}</p>
-                                <p className="text-muted-foreground">{restaurant.hours}</p>
+                                <p className="mb-8">{restaurant.description.length > 250 ? restaurant.description.slice(0, 250) + "..." : restaurant.description}</p>
+                                <p className="text-muted-foreground flex gap-2 items-center"><HomeIcon className="w-4 h-4" />{restaurant.address}</p>
+                                <p className="text-muted-foreground flex gap-2 items-center"><Phone className="w-4 h-4" />{restaurant.phoneNumber}</p>
+                                <p className="text-muted-foreground flex gap-2 items-center"><Clock className="w-4 h-4" />{restaurant.hours}</p>
                             </CardContent>
                             <CardFooter>
                                 <Link href={"/restaurantes/" + restaurant.slug}>
@@ -62,7 +87,7 @@ export default function RestaurantList({ restaurants }: { restaurants: Restauran
                         </Card>
                     ))}
                 </div>
-                <div className="order-first md:order-1 pb-8 md:pb-0 flex-1">
+                <div className="order-first md:order-1 pb-8 md:pb-0 flex-1 min-h-96">
                     <div className="bg-muted rounded-lg p-4 h-full flex items-center justify-center">
                         <p className="text-muted-foreground">Map will be displayed here</p>
                     </div>
