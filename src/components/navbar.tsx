@@ -13,7 +13,7 @@ export default function Navbar() {
                         </Link>
                     </div>
                     <nav className='flex gap-4'>
-                        <Link href="/" className='text-white hover:underline'>Localidades</Link>
+                        <Link href="/" className='text-white hover:underline'>Municípios</Link>
                         <Link href="/restaurantes" className='text-white hover:underline'>Restaurantes</Link>
                         <Link href="/sobre" className='text-white hover:underline'>Sobre</Link>
                     </nav>
