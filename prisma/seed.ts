@@ -1,8 +1,19 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
+    await prisma.user.create({
+        data: {
+            role: Role.ADMIN,
+            email: "admin@admin.com",
+            password: await Bun.password.hash("admin", {
+                algorithm: "bcrypt",
+                cost: 4,
+            }),
+        }
+    });
+
     await prisma.zone.createMany({
         data: [
             { name: "Albergaria-a-Velha", image: "/albergariaavelha.png" },
