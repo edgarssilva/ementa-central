@@ -1,3 +1,4 @@
+import HeroSearch from "@/components/hero-search";
 import { Card, CardTitle, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { PrismaClient } from "@prisma/client";
@@ -13,9 +14,22 @@ export default async function Home() {
     const selection = await prisma.restaurant.findMany({ take: 3 });
 
     return (
-        <div>
-            <div className="h-80 w-full bg-green-800" />
-            <div className="max-w-[64rem] py-4 mx-auto px-[1rem] pb-40">
+        <>
+            <div className="relative h-[550px] flex flex-col justify-center items-center text-white overflow-hidden">
+                <h1 className="text-6xl font-semibold">Ementa Central</h1>
+                <p className="text-2xl font-medium">O melhor guia de restaurantes de Portugal</p>
+                <HeroSearch className="mt-8 w-2/3" />
+
+                <Image
+                    src="/images/banner.jpg"
+                    className=" brightness-50 w-full h-full object-cover absolute z-[-1]"
+                    alt="Banner"
+                    width={1920}
+                    height={400}
+                    layout="responsive"
+                />
+            </div>
+            <div className=" max-w-[64rem] py-4 mx-auto px-[1rem] pb-40">
                 <h1 className="text-2xl font-semibold mt-4 mb-2">Seleções Ementa Central</h1>
                 <div className="flex gap-8">
                     {selection.map((restaurant) => (
@@ -59,6 +73,6 @@ export default async function Home() {
                     <CarouselNext />
                 </Carousel>
             </div >
-        </div>
+        </>
     );
 }
